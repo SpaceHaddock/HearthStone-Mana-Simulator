@@ -1,0 +1,212 @@
+﻿<Window x:Class="HearthstoneSimulation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HearthstoneSimulation"
+		xmlns:ComponentModel="clr-namespace:System.ComponentModel;assembly=System"
+		xmlns:oxy="http://oxyplot.org/wpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525">
+
+	<Window.Resources>
+		<ComponentModel:BackgroundWorker
+            x:Key="backgroundWorker"
+            WorkerReportsProgress="True"
+            WorkerSupportsCancellation="True"
+            DoWork="BackgroundWorker_DoWork"
+            RunWorkerCompleted="BackgroundWorker_RunWorkerCompleted"
+            ProgressChanged="BackgroundWorker_ProgressChanged"/>
+		<Style x:Key="BorderStyle" TargetType="{x:Type Border}">
+			<Setter Property="CornerRadius" Value="6"/>
+			<Setter Property="BorderBrush" Value="Black"/>
+			<Setter Property="Background" Value="White"/>
+			<Setter Property="BorderThickness" Value="2"/>
+			<Setter Property="Padding" Value="8"/>
+			<Setter Property="Margin" Value="5"/>
+		</Style>
+		<Style x:Key="LineSeriesStyle" TargetType="{x:Type oxy:LineSeries}">
+			<Setter Property="LabelFormatString" Value="{}{1}"/>
+			<Setter Property="MarkerSize" Value="5"/>
+			<Setter Property="MarkerFill" Value="Black"/>
+			<Setter Property="MarkerType" Value="Circle"/>
+			<Setter Property="LineStyle" Value="Dash"/>
+			<Setter Property="ToolTip" Value="bar"/>
+		</Style>
+	</Window.Resources>
+
+	<TabControl>
+		<TabItem Header="Main">
+			<StackPanel>
+				<ListBox ItemsSource="{Binding deck}" DisplayMemberPath="mana_cost">
+					<ListBox.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel/>
+						</ItemsPanelTemplate>
+					</ListBox.ItemsPanel>
+				</ListBox>
+
+				<Button Content="Load Deck" Click="LoadDeckButton_Click"/>
+				<Button Content="Simulate" Click="SimulateButton_Click"/>
+				<TextBox Text="{Binding sim_count}"/>
+				<TextBlock Name="Progress_TextBox" Text="Progress: Not started"/>
+				<ProgressBar Name="Progress_Bar" Height="8"/>
+
+				<StackPanel Orientation="Horizontal">
+					<TextBlock Width="100" Text="Turn"/>
+					<TextBlock Width="100" Text="Mana Used"/>
+				</StackPanel>
+				<ItemsControl Name="testbox" ItemsSource="{Binding average_game}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Vertical"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<!--Each turn's view-->
+							<Border Style="{StaticResource BorderStyle}">
+								<StackPanel Orientation="Horizontal" Width="Auto">
+									<TextBlock Text="{Binding turn_number}" FontSize="55" Margin="0,0,10,0" VerticalAlignment="Center"/>
+
+									<StackPanel Orientation="Vertical" VerticalAlignment="Center">
+										<TextBlock Text="{Binding mana_used, StringFormat=Mana Used: {0:0.00}}"/>
+										<TextBlock Text="{Binding hand_card_count, StringFormat=Cards in hand: {0}}"/>
+										<TextBlock Text="{Binding drawn_card_count, StringFormat=Cards drawn: {0}}"/>
+										<TextBlock Text="{Binding played_card_count, StringFormat=Cards played: {0}}"/>
+									</StackPanel>
+
+									<Border Style="{StaticResource BorderStyle}">
+										<StackPanel>
+											<TextBlock Text="Most Common Cards in Hand" HorizontalAlignment="Center"/>
+											<ItemsControl ItemsSource="{Binding most_common_hand_cards}">
+												<ItemsControl.ItemsPanel>
+													<ItemsPanelTemplate>
+														<StackPanel Orientation="Vertical"/>
+													</ItemsPanelTemplate>
+												</ItemsControl.ItemsPanel>
+												<ItemsControl.ItemTemplate>
+													<DataTemplate>
+														<TextBlock Text="{Binding}"/>
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</StackPanel>
+									</Border>
+
+									<Border Style="{StaticResource BorderStyle}">
+										<StackPanel>
+											<TextBlock Text="Most Common Cards Played" HorizontalAlignment="Center"/>
+											<ItemsControl ItemsSource="{Binding most_common_played_cards}">
+												<ItemsControl.ItemsPanel>
+													<ItemsPanelTemplate>
+														<StackPanel Orientation="Vertical"/>
+													</ItemsPanelTemplate>
+												</ItemsControl.ItemsPanel>
+												<ItemsControl.ItemTemplate>
+													<DataTemplate>
+														<TextBlock Text="{Binding}"/>
+													</DataTemplate>
+												</ItemsControl.ItemTemplate>
+											</ItemsControl>
+										</StackPanel>
+									</Border>
+								</StackPanel>
+							</Border>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
+		</TabItem>
+
+		<!--X by X-->
+		<TabItem Header="Turn by Turn">
+			<StackPanel>
+				<ComboBox ItemsSource="{Binding average_game}" DisplayMemberPath="turn_by_turn_string" SelectedItem="{Binding turn_by_turn_selection, Mode=TwoWay}"/>
+				<!--Each turn's view-->
+				<Border Style="{StaticResource BorderStyle}" DataContext="{Binding turn_by_turn_selection}">
+					<StackPanel Orientation="Horizontal" Width="Auto">
+						<TextBlock Text="{Binding turn_number}" FontSize="55" Margin="0,0,10,0" VerticalAlignment="Center"/>
+
+						<StackPanel Orientation="Vertical" VerticalAlignment="Center">
+							<TextBlock Text="{Binding mana_used, StringFormat=Mana Used: {0:0.00}}"/>
+							<TextBlock Text="{Binding hand_card_count, StringFormat=Cards in hand: {0}}"/>
+							<TextBlock Text="{Binding drawn_card_count, StringFormat=Cards drawn: {0}}"/>
+							<TextBlock Text="{Binding played_card_count, StringFormat=Cards played: {0}}"/>
+						</StackPanel>
+
+						<Border Style="{StaticResource BorderStyle}">
+							<StackPanel>
+								<TextBlock Text="Most Common Cards in Hand" HorizontalAlignment="Center"/>
+								<ItemsControl ItemsSource="{Binding most_common_hand_cards}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Orientation="Vertical"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding}"/>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</Border>
+
+						<Border Style="{StaticResource BorderStyle}">
+							<StackPanel>
+								<TextBlock Text="Most Common Cards Played" HorizontalAlignment="Center"/>
+								<ItemsControl ItemsSource="{Binding most_common_played_cards}">
+									<ItemsControl.ItemsPanel>
+										<ItemsPanelTemplate>
+											<StackPanel Orientation="Vertical"/>
+										</ItemsPanelTemplate>
+									</ItemsControl.ItemsPanel>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding}"/>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</StackPanel>
+						</Border>
+					</StackPanel>
+				</Border>
+			</StackPanel>
+		</TabItem>
+
+		<!--Line graphs-->
+		<TabItem Header="Mana Spent">
+			<oxy:PlotView Title="Mana Spent">
+				<oxy:PlotView.Series>
+					<oxy:LineSeries ItemsSource="{Binding average_mana}" Style="{StaticResource LineSeriesStyle}"/>
+				</oxy:PlotView.Series>
+			</oxy:PlotView>
+		</TabItem>
+
+		<TabItem Header="Cards In Hand">
+			<oxy:PlotView Title="Cards In Hand">
+				<oxy:PlotView.Series>
+					<oxy:LineSeries ItemsSource="{Binding average_hand_cards}" Style="{StaticResource LineSeriesStyle}"/>
+				</oxy:PlotView.Series>
+			</oxy:PlotView>
+		</TabItem>
+
+		<TabItem Header="Cards Played">
+			<oxy:PlotView Title="Cards Played">
+				<oxy:PlotView.Series>
+					<oxy:LineSeries ItemsSource="{Binding average_played_cards}" Style="{StaticResource LineSeriesStyle}"/>
+				</oxy:PlotView.Series>
+			</oxy:PlotView>
+		</TabItem>
+
+		<TabItem Header="Cards Drawn">
+			<oxy:PlotView Title="Cards Drawn">
+				<oxy:PlotView.Series>
+					<oxy:LineSeries ItemsSource="{Binding average_drawn_cards}" Style="{StaticResource LineSeriesStyle}"/>
+				</oxy:PlotView.Series>
+			</oxy:PlotView>
+		</TabItem>
+
+	</TabControl>
+</Window>
