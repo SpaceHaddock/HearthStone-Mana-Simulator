@@ -9,12 +9,21 @@ namespace HearthstoneSimulation
 {
 	public class Card : Intable
 	{
+		/*
 		public string name { get; set; } = "no name";
 
 		public int mana_cost { get; set; } = 1;
 		public int draw_count { get; set; } = 0;
 		public bool mulligan { get; set; } = true;
 		public int hold_until_turn { get; set; } = 0;
+		*/
+		
+		public string name { get; set; }
+
+		public int mana_cost { get; set; }
+		public int draw_count { get; set; }
+		public bool mulligan { get; set; }
+		public int hold_until_turn { get; set; }
 
 		public override int Intval()
 		{

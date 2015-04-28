@@ -40,7 +40,9 @@ namespace HearthstoneSimulation
 		private void LoadDeckButton_Click(object sender, RoutedEventArgs e)
 		{
 			OpenFileDialog of = new OpenFileDialog();
-			of.ShowDialog();
+			bool? is_loaded = of.ShowDialog();
+			if (is_loaded == false) return;
+
 			foreach(var worksheet in Workbook.Worksheets(of.FileName))
 			{
 				for (int i = 1; i < worksheet.Rows.Count(); i++)

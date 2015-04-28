@@ -51,15 +51,10 @@
 				<TextBox Text="{Binding sim_count}"/>
 				<TextBlock Name="Progress_TextBox" Text="Progress: Not started"/>
 				<ProgressBar Name="Progress_Bar" Height="8"/>
-
-				<StackPanel Orientation="Horizontal">
-					<TextBlock Width="100" Text="Turn"/>
-					<TextBlock Width="100" Text="Mana Used"/>
-				</StackPanel>
-				<ItemsControl Name="testbox" ItemsSource="{Binding average_game}">
-					<ItemsControl.ItemsPanel>
+                <ItemsControl Name="testbox" ItemsSource="{Binding average_game}" ScrollViewer.CanContentScroll="True">
+                    <ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
-							<StackPanel Orientation="Vertical"/>
+                            <StackPanel Orientation="Vertical"/>
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>

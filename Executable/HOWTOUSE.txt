@@ -1,0 +1,4 @@
+Run the program using the supplied shortcut
+Load in a deck of your choosing using the open file dialog, "Example Deck.xlsx" is supplied as an example of the formatting and for testing
+Push simulate to begin simulation, for a more accurate simulation increase the number of trials using the text input
+Use tabs at top to navigate through and view more detailed graphs on mana curve, card draw, etc.
